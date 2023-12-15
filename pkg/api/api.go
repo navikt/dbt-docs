@@ -71,8 +71,20 @@ func setupRoutes(server *echo.Echo, gcsClient *storage.Client, bucket string) {
 
 	server.GET("/:id", func(c echo.Context) error {
 		dbtID := c.Param("id")
-		fmt.Println("id", dbtID)
-		return nil
+		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/%v/index.html", dbtID))
+	})
+
+	server.GET("/:id/*", func(c echo.Context) error {
+		objReader, err := gcsClient.Bucket(bucket).Object(strings.Split(strings.TrimLeft(c.Request().URL.String(), "/"), "?")[0]).NewReader(c.Request().Context())
+		if err != nil {
+			return nil
+		}
+		datab, err := io.ReadAll(objReader)
+		if err != nil {
+			return err
+		}
+		_, err = c.Response().Writer.Write(datab)
+		return err
 	})
 }
 
