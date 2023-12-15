@@ -13,7 +13,7 @@ func main() {
 	ctx := context.Background()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	router, err := api.New(ctx)
+	router, err := api.New(ctx, "nada-dbt-docs-dev")
 	if err != nil {
 		logger.Error("creating api", "error", err)
 		os.Exit(1)

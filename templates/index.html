@@ -1,0 +1,18 @@
+{{define "index.html"}}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      DBT docs
+    </title>
+  </head>
+</html>
+<body>
+    <h1>DBT docs</h1>
+    <div style="display: flex; flex-direction: column;">
+    {{range $val := .dbtDocs}}
+        <a href="/{{$val}}">{{$val}}</a>
+    {{end}}
+    </div>
+</body>
+{{end}}
