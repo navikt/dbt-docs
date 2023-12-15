@@ -1,5 +1,8 @@
 name: build and push
-on: push
+on: 
+  push:
+    branches:
+      - main
 
 env:
   IMAGE: dbt-docs
@@ -26,7 +29,10 @@ jobs:
     name: Build and deploy
     runs-on: ubuntu-20.04
     needs: [build-and-push]
+    permissions:
+      contents: read
     steps:
+    - uses: actions/checkout@v4
     - name: Deploy to dev-gcp
       uses: nais/deploy/actions/deploy@v1
       env:
