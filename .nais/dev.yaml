@@ -1,0 +1,22 @@
+kind: "Application"
+apiVersion: "nais.io/v1alpha1"
+metadata:
+  name: dbt-docs
+  namespace: nada
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 50M
+  labels:
+    team: nada
+spec:
+  image: "{{ image }}"
+  port: 8080
+  ingresses:
+    - "https://dbt.intern.dev.nav.no"
+  env:
+    - name: DBT_DOCS_BUCKET
+      value: nada-dbt-docs-dev
+  gcp:
+    buckets:
+      - name: nada-dbt-docs-dev
+        publicAccessPrevention: true
+        uniformBucketLevelAccess: true

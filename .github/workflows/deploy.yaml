@@ -1,0 +1,28 @@
+name: build and push
+on: push
+
+env:
+  IMAGE: dbt-docs
+
+jobs:
+  build-and-deploy:
+    name: Build and deploy
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    - uses: actions/checkout@v4
+    - uses: nais/docker-build-push@v0
+      id: docker-build-push
+      with:
+        team: nada
+        identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+        project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+
+    - name: Deploy to dev-gcp
+      uses: nais/deploy/actions/deploy@v1
+      env:
+        APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+        CLUSTER: dev-gcp
+        RESOURCE: .nais/dev.yaml
