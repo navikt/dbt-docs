@@ -1,5 +1,6 @@
 *
 !pkg
+!templates
 !main.go
 !go.mod
 !go.sum
