@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log/slog"
 	"net/http"
 	"os"
@@ -9,11 +10,18 @@ import (
 	"github.com/navikt/dbt-docs/pkg/api"
 )
 
+var bucketName string
+
+func init() {
+	flag.StringVar(&bucketName, "bucket-name", os.Getenv("DBT_DOCS_BUCKET"), "The dbt docs bucket")
+}
+
 func main() {
+	flag.Parse()
 	ctx := context.Background()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	router, err := api.New(ctx, "nada-dbt-docs-dev")
+	router, err := api.New(ctx, bucketName, logger.With("subsystem", "api"))
 	if err != nil {
 		logger.Error("creating api", "error", err)
 		os.Exit(1)
