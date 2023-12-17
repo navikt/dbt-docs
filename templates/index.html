@@ -17,9 +17,7 @@
     </div>
     <div style="display: flex; flex-direction: column; text-align: center;">
     {{range $val := .dbtDocs}}
-        <ul>
-            <li><a href="/docs/{{$val}}">{{$val}}</a></li>
-        </ul>
+        <a href="/docs/{{$val}}" style="margin-bottom: 1rem;">{{$val}}</a></li>
     {{end}}
     </div>
 </body>
