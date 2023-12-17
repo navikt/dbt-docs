@@ -44,6 +44,7 @@ files = [
     "index.html",
 ]
 
+multipart_form_data={}
 for file_path in files:
     file_name = os.path.basename(file_path)
     with open(file_path, "rb") as file:
