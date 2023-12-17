@@ -16,8 +16,13 @@
         <h2>DBT dokumentasjon</h2>
     </div>
     <div style="display: flex; flex-direction: column; text-align: center;">
-    {{range $val := .dbtDocs}}
-        <a href="/docs/{{$val}}" style="margin-bottom: 1rem;">{{$val}}</a></li>
+    {{range $team, $docs := .dbtDocs}}
+        <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+            <h4>{{$team}}</h4>
+            {{range $doc := $docs}}
+                <a href="/docs/{{$team}}/{{$doc}}" style="margin-bottom: 1rem;">{{$doc}}</a>
+            {{end}}
+        </div>
     {{end}}
     </div>
 </body>

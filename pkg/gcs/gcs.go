@@ -26,8 +26,8 @@ func New(ctx context.Context, bucket string) (*GCSClient, error) {
 	}, nil
 }
 
-func (g *GCSClient) ListBucketDocFolders(ctx context.Context) []string {
-	rootFolders := []string{}
+func (g *GCSClient) ListTeamsAndDocsInBucket(ctx context.Context) map[string][]string {
+	teamsDocsMap := map[string][]string{}
 	objects := g.client.Bucket(g.bucket).Objects(ctx, &storage.Query{
 		Prefix: "docs/",
 	})
@@ -37,13 +37,13 @@ func (g *GCSClient) ListBucketDocFolders(ctx context.Context) []string {
 			break
 		}
 
-		docFolder := strings.Split(o.Name, "/")[1]
-		if docFolder != "" && !contains(rootFolders, docFolder) {
-			rootFolders = append(rootFolders, strings.Split(o.Name, "/")[1])
+		pathParts := strings.Split(o.Name, "/")
+		if len(pathParts) >= 3 && !contains(teamsDocsMap, pathParts[1], pathParts[2]) {
+			teamsDocsMap[pathParts[1]] = append(teamsDocsMap[pathParts[1]], pathParts[2])
 		}
 	}
 
-	return rootFolders
+	return teamsDocsMap
 }
 
 func (g *GCSClient) GetFile(ctx context.Context, filePath string) ([]byte, error) {
@@ -96,10 +96,12 @@ func (g *GCSClient) UploadFile(ctx context.Context, filePath string, content []b
 	return nil
 }
 
-func contains(files []string, file string) bool {
-	for _, f := range files {
-		if f == file {
-			return true
+func contains(teamsDocsMap map[string][]string, team, docID string) bool {
+	if _, ok := teamsDocsMap[team]; ok {
+		for _, existing := range teamsDocsMap[team] {
+			if existing == docID {
+				return true
+			}
 		}
 	}
 

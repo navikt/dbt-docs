@@ -55,9 +55,9 @@ func parseTemplates(server *echo.Echo) {
 
 func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 	server.GET("/", func(c echo.Context) error {
-		dbtDocs := gcs.ListBucketDocFolders(c.Request().Context())
+		teamsDocsMap := gcs.ListTeamsAndDocsInBucket(c.Request().Context())
 		return c.Render(http.StatusOK, "index.html", map[string]any{
-			"dbtDocs": dbtDocs,
+			"dbtDocs": teamsDocsMap,
 		})
 	})
 
@@ -65,12 +65,13 @@ func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 		return c.Redirect(http.StatusSeeOther, "/")
 	})
 
-	server.GET("/docs/:id", func(c echo.Context) error {
-		dbtID := c.Param("id")
-		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/docs/%v/index.html", dbtID))
+	server.GET("/docs/:team/:id", func(c echo.Context) error {
+		teamID := c.Param("team")
+		docID := c.Param("id")
+		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/docs/%v/%v/index.html", teamID, docID))
 	})
 
-	server.GET("/docs/:id/*", func(c echo.Context) error {
+	server.GET("/docs/:team/:id/*", func(c echo.Context) error {
 		bucketFilePath := bucketFilePathFromURLPath(c.Request().URL.String())
 		objectBytes, err := gcs.GetFile(c.Request().Context(), bucketFilePath)
 		if err != nil {
@@ -84,10 +85,11 @@ func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 		return err
 	})
 
-	server.POST("/docs/:id", func(c echo.Context) error {
+	server.POST("/docs/:team/:id", func(c echo.Context) error {
+		teamID := c.Param("team")
 		docID := c.Param("id")
 
-		docContent := gcs.ListFilesWithPrefix(c.Request().Context(), docID)
+		docContent := gcs.ListFilesWithPrefix(c.Request().Context(), fmt.Sprintf("docs/%v/%v", teamID, docID))
 		if len(docContent) > 0 {
 			return c.JSON(http.StatusConflict, map[string]string{
 				"status":  "error",
@@ -95,7 +97,7 @@ func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 			})
 		}
 
-		if err := uploadDocs(c, docID, gcs); err != nil {
+		if err := uploadDocs(c, teamID, docID, gcs); err != nil {
 			logger.Error(fmt.Sprintf("unable to upload dbt doc %v to bucket", docID), "error", err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"status":  "error",
@@ -108,10 +110,11 @@ func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 		})
 	})
 
-	server.PUT("/docs/:id", func(c echo.Context) error {
+	server.PUT("/docs/:team/:id", func(c echo.Context) error {
+		teamID := c.Param("team")
 		docID := c.Param("id")
 
-		if err := gcs.DeleteFilesWithPrefix(c.Request().Context(), docID); err != nil {
+		if err := gcs.DeleteFilesWithPrefix(c.Request().Context(), fmt.Sprintf("docs/%v/%v", teamID, docID)); err != nil {
 			logger.Error(fmt.Sprintf("error deleting dbt doc '%v' before updating", docID), "error", err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"status":  "error",
@@ -119,7 +122,7 @@ func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 			})
 		}
 
-		if err := uploadDocs(c, docID, gcs); err != nil {
+		if err := uploadDocs(c, teamID, docID, gcs); err != nil {
 			logger.Error(fmt.Sprintf("error uploading dbt doc '%v'", docID), "error", err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"status":  "error",
@@ -132,9 +135,10 @@ func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 		})
 	})
 
-	server.PATCH("/docs/:id", func(c echo.Context) error {
+	server.PATCH("/docs/:team/:id", func(c echo.Context) error {
+		teamID := c.Param("team")
 		docID := c.Param("id")
-		if err := uploadDocs(c, docID, gcs); err != nil {
+		if err := uploadDocs(c, teamID, docID, gcs); err != nil {
 			logger.Error(fmt.Sprintf("error uploading dbt doc '%v'", docID), "error", err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"status":  "error",
@@ -153,7 +157,7 @@ func bucketFilePathFromURLPath(urlPath string) string {
 	return strings.Split(withoutPathPrefix, "?")[0]
 }
 
-func uploadDocs(c echo.Context, docID string, gcs *gcs.GCSClient) error {
+func uploadDocs(c echo.Context, teamID, docID string, gcs *gcs.GCSClient) error {
 	if err := c.Request().ParseMultipartForm(maxMemoryMultipartForm); err != nil {
 		return err
 	}
@@ -172,7 +176,7 @@ func uploadDocs(c echo.Context, docID string, gcs *gcs.GCSClient) error {
 			fileBytes = addHomeLink(fileBytes)
 		}
 
-		if err := gcs.UploadFile(c.Request().Context(), fmt.Sprintf("docs/%v/%v", docID, fileName), fileBytes); err != nil {
+		if err := gcs.UploadFile(c.Request().Context(), fmt.Sprintf("docs/%v/%v/%v", teamID, docID, fileName), fileBytes); err != nil {
 			return err
 		}
 	}
