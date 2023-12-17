@@ -9,12 +9,17 @@
   </head>
 </html>
 <body>
-    <div style="height: 20%; background-color: blue;">
-        <h1>NAV DBT</h1>
+    <div style="display: flex; justify-content: center; gap: 1rem;">
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <img src="https://www.nav.no/dekoratoren/media/nav-logo-red.svg"/>
+        </div>
+        <h2>DBT dokumentasjon</h2>
     </div>
-    <div style="display: flex; flex-direction: column;">
+    <div style="display: flex; flex-direction: column; text-align: center;">
     {{range $val := .dbtDocs}}
-        <a href="/docs/{{$val}}">{{$val}}</a>
+        <ul>
+            <li><a href="/docs/{{$val}}">{{$val}}</a></li>
+        </ul>
     {{end}}
     </div>
 </body>

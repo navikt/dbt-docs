@@ -37,7 +37,8 @@ func (g *GCSClient) ListBucketDocFolders(ctx context.Context) []string {
 			break
 		}
 
-		if !contains(rootFolders, strings.Split(o.Name, "/")[1]) {
+		docFolder := strings.Split(o.Name, "/")[1]
+		if docFolder != "" && !contains(rootFolders, docFolder) {
 			rootFolders = append(rootFolders, strings.Split(o.Name, "/")[1])
 		}
 	}
