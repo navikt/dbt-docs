@@ -26,17 +26,19 @@ func New(ctx context.Context, bucket string) (*GCSClient, error) {
 	}, nil
 }
 
-func (g *GCSClient) ListBucketRootFolders(ctx context.Context) []string {
+func (g *GCSClient) ListBucketDocFolders(ctx context.Context) []string {
 	rootFolders := []string{}
-	objects := g.client.Bucket(g.bucket).Objects(ctx, nil)
+	objects := g.client.Bucket(g.bucket).Objects(ctx, &storage.Query{
+		Prefix: "docs/",
+	})
 	for {
 		o, err := objects.Next()
 		if errors.Is(err, iterator.Done) {
 			break
 		}
 
-		if !contains(rootFolders, strings.Split(o.Name, "/")[0]) {
-			rootFolders = append(rootFolders, strings.Split(o.Name, "/")[0])
+		if !contains(rootFolders, strings.Split(o.Name, "/")[1]) {
+			rootFolders = append(rootFolders, strings.Split(o.Name, "/")[1])
 		}
 	}
 
@@ -46,7 +48,7 @@ func (g *GCSClient) ListBucketRootFolders(ctx context.Context) []string {
 func (g *GCSClient) GetFile(ctx context.Context, filePath string) ([]byte, error) {
 	objReader, err := g.client.Bucket(g.bucket).Object(filePath).NewReader(ctx)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	return io.ReadAll(objReader)
 }

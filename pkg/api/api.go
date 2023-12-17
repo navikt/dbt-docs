@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/navikt/dbt-docs/pkg/gcs"
 )
 
@@ -37,6 +38,7 @@ func New(ctx context.Context, bucket string, logger *slog.Logger) (*echo.Echo, e
 	}
 
 	server := echo.New()
+	server.Pre(middleware.RemoveTrailingSlash())
 	parseTemplates(server)
 	setupRoutes(server, gcs, logger)
 
@@ -53,10 +55,33 @@ func parseTemplates(server *echo.Echo) {
 
 func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 	server.GET("/", func(c echo.Context) error {
-		dbtDocs := gcs.ListBucketRootFolders(c.Request().Context())
+		dbtDocs := gcs.ListBucketDocFolders(c.Request().Context())
 		return c.Render(http.StatusOK, "index.html", map[string]any{
 			"dbtDocs": dbtDocs,
 		})
+	})
+
+	server.GET("/docs", func(c echo.Context) error {
+		return c.Redirect(http.StatusSeeOther, "/")
+	})
+
+	server.GET("/docs/:id", func(c echo.Context) error {
+		dbtID := c.Param("id")
+		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/docs/%v/index.html", dbtID))
+	})
+
+	server.GET("/docs/:id/*", func(c echo.Context) error {
+		bucketFilePath := bucketFilePathFromURLPath(c.Request().URL.String())
+		objectBytes, err := gcs.GetFile(c.Request().Context(), bucketFilePath)
+		if err != nil {
+			logger.Error(fmt.Sprintf("unable to read object %v, error: %v", bucketFilePath, err.Error()), "error", err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{
+				"status":  "error",
+				"message": fmt.Sprintf("unable to read object '%v'", bucketFilePath),
+			})
+		}
+		_, err = c.Response().Writer.Write(objectBytes)
+		return err
 	})
 
 	server.POST("/docs/:id", func(c echo.Context) error {
@@ -121,29 +146,10 @@ func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 			"message": fmt.Sprintf("updated dbt docs for %v", docID),
 		})
 	})
-
-	server.GET("/docs/:id", func(c echo.Context) error {
-		dbtID := c.Param("id")
-		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/docs/%v/index.html", dbtID))
-	})
-
-	server.GET("/docs/:id/*", func(c echo.Context) error {
-		bucketFilePath := bucketFilePathFromURLPath(c.Request().URL.String())
-		objectBytes, err := gcs.GetFile(c.Request().Context(), bucketFilePath)
-		if err != nil {
-			logger.Error(fmt.Sprintf("unable to read object, error: %v", err.Error()), "error", err)
-			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"status":  "error",
-				"message": fmt.Sprintf("unable to read object '%v'", bucketFilePath),
-			})
-		}
-		_, err = c.Response().Writer.Write(objectBytes)
-		return err
-	})
 }
 
 func bucketFilePathFromURLPath(urlPath string) string {
-	withoutPathPrefix := strings.TrimPrefix(urlPath, "/docs/")
+	withoutPathPrefix := strings.TrimPrefix(urlPath, "/")
 	return strings.Split(withoutPathPrefix, "?")[0]
 }
 
@@ -161,9 +167,25 @@ func uploadDocs(c echo.Context, docID string, gcs *gcs.GCSClient) error {
 		if err != nil {
 			return err
 		}
-		if err := gcs.UploadFile(c.Request().Context(), fmt.Sprintf("%v/%v", docID, fileName), fileBytes); err != nil {
+
+		if fileName == "index.html" {
+			fileBytes = addHomeLink(fileBytes)
+		}
+
+		if err := gcs.UploadFile(c.Request().Context(), fmt.Sprintf("docs/%v/%v", docID, fileName), fileBytes); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func addHomeLink(fileBytes []byte) []byte {
+	altered := strings.Replace(
+		string(fileBytes),
+		`<img style="width: 100px; height: 40px" class="logo" ng-src="{{ logo }}" />`,
+		`<a href="/"><img style="width: 100px; height: 40px" class="logo" ng-src="{{ logo }}" /></a>`,
+		1,
+	)
+
+	return []byte(altered)
 }
