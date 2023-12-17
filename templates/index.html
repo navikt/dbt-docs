@@ -17,10 +17,12 @@
     </div>
     <div style="display: flex; flex-direction: column; text-align: center;">
     {{range $team, $docs := .dbtDocs}}
-        <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+        <div style="display: flex; flex-direction: column; gap: 0.2rem; margin-bottom: 1rem;">
             <h4>{{$team}}</h4>
             {{range $doc := $docs}}
-                <a href="/docs/{{$team}}/{{$doc}}" style="margin-bottom: 1rem;">{{$doc}}</a>
+                <div>
+                    <a href="/docs/{{$team}}/{{$doc}}">{{$doc}}</a>
+                </div>
             {{end}}
         </div>
     {{end}}
