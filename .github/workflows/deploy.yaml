@@ -26,7 +26,7 @@ jobs:
         project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
 
   deploy:
-    name: deploy dev
+    name: deploy
     runs-on: ubuntu-20.04
     needs: [build-and-push]
     permissions:
