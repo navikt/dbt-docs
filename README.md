@@ -1,4 +1,4 @@
-# NAV dbt dokumentasjon
+# NAV DBT dokumentasjon
 Felles katalogløsning for generert dbt docs.
 
 - [Prod](https://dbt.intern.nav.no)
