@@ -3,6 +3,7 @@ module github.com/navikt/dbt-docs
 go 1.21.3
 
 require (
+	cloud.google.com/go/bigquery v1.57.1
 	cloud.google.com/go/storage v1.35.1
 	github.com/labstack/echo/v4 v4.11.3
 	google.golang.org/api v0.150.0
@@ -10,7 +11,6 @@ require (
 
 require (
 	cloud.google.com/go v0.110.8 // indirect
-	cloud.google.com/go/bigquery v1.57.1 // indirect
 	cloud.google.com/go/compute v1.23.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.3 // indirect
