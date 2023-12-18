@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/navikt/dbt-docs/pkg/api"
+	"github.com/navikt/dbt-docs/pkg/bigquery"
 )
 
 var (
@@ -29,13 +30,13 @@ func main() {
 	ctx := context.Background()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	// bq, err := bigquery.New(ctx, bigqueryProject, bigqueryDataset, bigqueryTable)
-	// if err != nil {
-	// 	logger.Error("creating bigquery client", "error", err)
-	// 	os.Exit(1)
-	// }
+	bq, err := bigquery.New(ctx, bigqueryProject, bigqueryDataset, bigqueryTable)
+	if err != nil {
+		logger.Error("creating bigquery client", "error", err)
+		os.Exit(1)
+	}
 
-	router, err := api.New(ctx, bucketName, nil, logger.With("subsystem", "api"))
+	router, err := api.New(ctx, bucketName, bq, logger.With("subsystem", "api"))
 	if err != nil {
 		logger.Error("creating api", "error", err)
 		os.Exit(1)
