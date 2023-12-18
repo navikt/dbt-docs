@@ -194,7 +194,7 @@ func uploadDocs(c echo.Context, teamID, docID string, gcs *gcs.GCSClient) error 
 func isIndexPage(c echo.Context) (string, bool) {
 	urlPathParts := strings.Split(c.Request().URL.Path, "/")
 	if urlPathParts[len(urlPathParts)-1] == "index.html" {
-		path := strings.Join(urlPathParts[:len(urlPathParts)-2], "")
+		path := strings.Join(urlPathParts[:len(urlPathParts)-1], "")
 		return fmt.Sprintf("%v://%v/%v", c.Scheme(), c.Request().Host, path), true
 	}
 	return "", false
