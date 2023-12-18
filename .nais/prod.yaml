@@ -24,7 +24,7 @@ spec:
       - name: nada-dbt-docs-prod
         publicAccessPrevention: true
         uniformBucketLevelAccess: true
-    bigqueryDatasets:
+    bigQueryDatasets:
       - cascadingDelete: false
         description: Metrikker på visninger av dbt dokumentasjon
         name: dbt_docs
