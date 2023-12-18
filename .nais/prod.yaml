@@ -28,3 +28,4 @@ spec:
       - cascadingDelete: false
         description: Metrikker på visninger av dbt dokumentasjon
         name: dbt_docs
+        permission: READWRITE
