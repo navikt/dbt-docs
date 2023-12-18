@@ -54,3 +54,8 @@ for file_path in files:
 res = requests.put("https://{HOST}/docs/{TEAM}/{DBT_PROSJEKT}", files=multipart_form_data)
 res.raise_for_status()
 ```
+
+## Lokal utvikling
+```sh
+$ go run . --bucket-name nada-dbt-docs-dev
+```
