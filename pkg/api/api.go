@@ -11,6 +11,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/navikt/dbt-docs/pkg/bigquery"
 	"github.com/navikt/dbt-docs/pkg/gcs"
 )
 
@@ -31,7 +32,7 @@ func (t *Templates) Render(w io.Writer, name string, data any, c echo.Context) e
 	return template.ExecuteTemplate(w, name, data)
 }
 
-func New(ctx context.Context, bucket string, logger *slog.Logger) (*echo.Echo, error) {
+func New(ctx context.Context, bucket string, bq *bigquery.BigQuery, logger *slog.Logger) (*echo.Echo, error) {
 	gcs, err := gcs.New(ctx, bucket)
 	if err != nil {
 		return nil, err
@@ -40,7 +41,7 @@ func New(ctx context.Context, bucket string, logger *slog.Logger) (*echo.Echo, e
 	server := echo.New()
 	server.Pre(middleware.RemoveTrailingSlash())
 	parseTemplates(server)
-	setupRoutes(server, gcs, logger)
+	setupRoutes(server, gcs, bq, logger)
 
 	return server, nil
 }
@@ -53,7 +54,7 @@ func parseTemplates(server *echo.Echo) {
 	}
 }
 
-func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
+func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, bq *bigquery.BigQuery, logger *slog.Logger) {
 	server.GET("/", func(c echo.Context) error {
 		teamsDocsMap := gcs.ListTeamsAndDocsInBucket(c.Request().Context())
 		return c.Render(http.StatusOK, "index.html", map[string]any{
@@ -81,6 +82,13 @@ func setupRoutes(server *echo.Echo, gcs *gcs.GCSClient, logger *slog.Logger) {
 				"message": fmt.Sprintf("unable to read object '%v'", bucketFilePath),
 			})
 		}
+
+		if url, ok := isIndexPage(c); ok {
+			if err := bq.RegisterView(c.Request().Context(), url); err != nil {
+				logger.Error("registering dbt doc view in bigquery", "error", err)
+			}
+		}
+
 		_, err = c.Response().Writer.Write(objectBytes)
 		return err
 	})
@@ -181,6 +189,15 @@ func uploadDocs(c echo.Context, teamID, docID string, gcs *gcs.GCSClient) error 
 		}
 	}
 	return nil
+}
+
+func isIndexPage(c echo.Context) (string, bool) {
+	urlPathParts := strings.Split(c.Request().URL.Path, "/")
+	if urlPathParts[len(urlPathParts)-1] == "index.html" {
+		path := strings.Join(urlPathParts[:len(urlPathParts)-2], "")
+		return fmt.Sprintf("%v://%v/%v", c.Scheme(), c.Request().Host, path), true
+	}
+	return "", false
 }
 
 func addHomeLink(fileBytes []byte) []byte {

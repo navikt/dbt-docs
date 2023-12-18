@@ -15,8 +15,16 @@ spec:
   env:
     - name: DBT_DOCS_BUCKET
       value: nada-dbt-docs-prod
+    - name: BIGQUERY_DATASET
+      value: dbt_docs
+    - name: BIGQUERY_TABLE
+      value: views
   gcp:
     buckets:
       - name: nada-dbt-docs-prod
         publicAccessPrevention: true
         uniformBucketLevelAccess: true
+    bigqueryDatasets:
+      - cascadingDelete: false
+        description: Metrikker på visninger av dbt dokumentasjon
+        name: dbt_docs
