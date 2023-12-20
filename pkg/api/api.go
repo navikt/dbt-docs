@@ -202,7 +202,7 @@ func isIndexPage(c echo.Context) (string, bool) {
 }
 
 func addHomeLink(fileBytes []byte) []byte {
-	r, _ := regexp.Compile(`<img.*"{{ logo }}".*\/>`)
+	r, _ := regexp.Compile(`<img.*"{{ logo }}" ?\/>`)
 	logoElement := r.FindString(string(fileBytes))
 	altered := strings.Replace(
 		string(fileBytes),
