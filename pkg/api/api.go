@@ -40,6 +40,7 @@ func New(ctx context.Context, bucket string, bq *bigquery.BigQuery, logger *slog
 
 	server := echo.New()
 	server.Pre(middleware.RemoveTrailingSlash())
+	server.Static("/static", "assets")
 	parseTemplates(server)
 	setupRoutes(server, gcs, bq, logger)
 
