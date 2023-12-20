@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -201,10 +202,12 @@ func isIndexPage(c echo.Context) (string, bool) {
 }
 
 func addHomeLink(fileBytes []byte) []byte {
+	r, _ := regexp.Compile(`<img.*"{{ logo }}".*\/>`)
+	logoElement := r.FindString(string(fileBytes))
 	altered := strings.Replace(
 		string(fileBytes),
-		`<img style="width: 100px; height: 40px" class="logo" ng-src="{{ logo }}" />`,
-		`<a href="/"><img style="width: 100px; height: 40px" class="logo" ng-src="{{ logo }}" /></a>`,
+		logoElement,
+		fmt.Sprintf(`<a href="/">%v</a>`, logoElement),
 		1,
 	)
 
