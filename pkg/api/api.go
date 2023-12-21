@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -195,17 +196,19 @@ func uploadDocs(c echo.Context, teamID, docID string, gcs *gcs.GCSClient) error 
 func isIndexPage(c echo.Context) (string, bool) {
 	urlPathParts := strings.Split(c.Request().URL.Path, "/")
 	if urlPathParts[len(urlPathParts)-1] == "index.html" {
-		path := strings.Join(urlPathParts[:len(urlPathParts)-2], "")
+		path := strings.Join(urlPathParts[:len(urlPathParts)-1], "")
 		return fmt.Sprintf("%v://%v/%v", c.Scheme(), c.Request().Host, path), true
 	}
 	return "", false
 }
 
 func addHomeLink(fileBytes []byte) []byte {
+	r, _ := regexp.Compile(`<img.*"{{ logo }}" ?\/>`)
+	logoElement := r.FindString(string(fileBytes))
 	altered := strings.Replace(
 		string(fileBytes),
-		`<img style="width: 100px; height: 40px" class="logo" ng-src="{{ logo }}" />`,
-		`<a href="/"><img style="width: 100px; height: 40px" class="logo" ng-src="{{ logo }}" /></a>`,
+		logoElement,
+		fmt.Sprintf(`<a href="/">%v</a>`, logoElement),
 		1,
 	)
 
