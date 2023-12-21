@@ -1,13 +1,18 @@
 # NAV DBT dokumentasjon
-Felles katalogløsning for generert dbt docs.
+
+Felles katalogløsning for generert DBT docs.
 
 - [Prod](https://dbt.intern.nav.no)
 - [Dev](https://dbt.intern.dev.nav.no)
 
 ## Publisering
-Publisering gjøres med en http `PUT` til https://{HOST}/docs/{TEAM}/{DBT_PROSJEKT}. 
-Merk: Denne operasjonen vil erstatte alt du tidligere har publisert for dbt prosjektet du prøver å oppdatere.
-Hvis du i stedet ønsker å legge til filer gjøres det en http `PATCH` mot samme api.
+
+Publisering gjøres med en HTTP `PUT` til `https://{HOST}/docs/{TEAM}/{DBT_PROSJEKT}`.
+
+> [!WARNING]
+> HTTP `PUT` operasjonen vil erstatte alt du tidligere har publisert for DBT prosjektet du prøver å oppdatere.
+
+Man kan bruke HTTP `PATCH` mot samme endepunkt for å gjøre endringer på enkeltfiler.
 
 - `{HOST}` erstattes med miljøet du vil publisere til
     - For prod: `dbt.intern.nav.no`
@@ -21,8 +26,8 @@ Alle følgende genererte filer for dokumentasjonen er nødvendig:
 - `catalog.json`
 - `manifest.json`
 
-Under er eksempler på publisering med [curl](#eksempel-med-curl) og [python](#eksempel-med-python).
-Begge eksemplene forutsetter at kommando eller skript kjøres fra mappen med filene listet opp over, og igjen må `{HOST}`, `{TEAM}` og `{DBT_PROSJEKT}` erstattes.
+Under er eksempler på publisering med [Curl](#eksempel-med-curl) og [Python](#eksempel-med-python).
+Begge eksemplene forutsetter at kommando eller skript kjøres fra katalogen med filene, og igjen må `{HOST}`, `{TEAM}` og `{DBT_PROSJEKT}` erstattes.
 
 ### Eksempel med curl
 ```sh
@@ -55,7 +60,15 @@ res = requests.put("https://{HOST}/docs/{TEAM}/{DBT_PROSJEKT}", files=multipart_
 res.raise_for_status()
 ```
 
-## Lokal utvikling
-```sh
-$ go run . --bucket-name nada-dbt-docs-dev
-```
+## Utvikling
+
+### Generer CSS
+
+Du kan manuelt generere CSS med kommandoen nedenfor.
+Kommandoen blir også kjørt automatisk ved bruk av `Air`.
+
+    npx tailwindcss --postcss -i templates/input.css -o assets/css/main.css
+
+### Kjøre lokalt med Air
+
+    air

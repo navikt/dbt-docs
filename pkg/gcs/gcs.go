@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"log/slog"
 	"strings"
 
 	"cloud.google.com/go/storage"
@@ -20,6 +21,7 @@ func New(ctx context.Context, bucket string) (*GCSClient, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &GCSClient{
 		client: client,
 		bucket: bucket,
@@ -31,14 +33,20 @@ func (g *GCSClient) ListTeamsAndDocsInBucket(ctx context.Context) map[string][]s
 	objects := g.client.Bucket(g.bucket).Objects(ctx, &storage.Query{
 		Prefix: "docs/",
 	})
+
 	for {
 		o, err := objects.Next()
-		if errors.Is(err, iterator.Done) {
-			break
+		if err != nil {
+			if errors.Is(err, iterator.Done) {
+				break
+			}
+
+			slog.Error("listing objects", "error", err)
+			return teamsDocsMap
 		}
 
 		pathParts := strings.Split(o.Name, "/")
-		if len(pathParts) >= 3 && !contains(teamsDocsMap, pathParts[1], pathParts[2]) {
+		if len(pathParts) >= 3 && !contains(teamsDocsMap, pathParts[1], pathParts[2]) && pathParts[2] != "" {
 			teamsDocsMap[pathParts[1]] = append(teamsDocsMap[pathParts[1]], pathParts[2])
 		}
 	}
@@ -51,6 +59,7 @@ func (g *GCSClient) GetFile(ctx context.Context, filePath string) ([]byte, error
 	if err != nil {
 		return nil, err
 	}
+
 	return io.ReadAll(objReader)
 }
 
@@ -71,6 +80,7 @@ func (g *GCSClient) ListFilesWithPrefix(ctx context.Context, prefix string) []st
 	dbts := g.client.Bucket(g.bucket).Objects(ctx, &storage.Query{
 		Prefix: prefix,
 	})
+
 	for {
 		o, err := dbts.Next()
 		if errors.Is(err, iterator.Done) {
@@ -89,6 +99,7 @@ func (g *GCSClient) UploadFile(ctx context.Context, filePath string, content []b
 	if err != nil {
 		return err
 	}
+
 	if err := writer.Close(); err != nil {
 		return err
 	}
