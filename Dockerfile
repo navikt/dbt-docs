@@ -15,5 +15,6 @@ WORKDIR /app
 
 COPY --from=builder /src/dbt-docs /app/dbt-docs
 COPY templates /app/templates
+COPY assets /app/static
 
 CMD ["/app/dbt-docs"]
