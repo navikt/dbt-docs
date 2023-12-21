@@ -62,6 +62,12 @@ res.raise_for_status()
 
 ## Utvikling
 
+### Generer CSS
+
+Du kan manuelt generere CSS med kommandoen nedenfor.
+Kommandoen blir også kjørt automatisk ved bruk av `Air`.
+
+    npx tailwindcss --postcss -i assets/css/input.css -o assets/css/main.css
 
 ### Kjøre lokalt med Air
 
