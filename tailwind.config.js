@@ -5,5 +5,6 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  presets: [require("@navikt/ds-tailwind")]
 }
 
