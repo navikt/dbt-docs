@@ -12,6 +12,7 @@ spec:
   port: 8080
   ingresses:
     - "https://dbt.intern.nav.no"
+    - "https://dbt.ansatt.nav.no"
   env:
     - name: DBT_DOCS_BUCKET
       value: nada-dbt-docs-prod
