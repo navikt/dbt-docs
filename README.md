@@ -56,8 +56,11 @@ for file_path in files:
         file_contents = file.read()
         multipart_form_data[file_path] = (file_name, file_contents)
 
-res = requests.put("https://{HOST}/docs/{TEAM}/{DBT_PROSJEKT}", files=multipart_form_data)
+res = requests.put("https://{HOST}/docs/{TEAM}/{DBT_PROSJEKT}", files=multipart_form_data, allow_redirects=False)
 res.raise_for_status()
+
+if res.status_code not in ["200", "201"]:
+    raise requests.exceptions.HTTPError(f"uploading dbt docs, expected status code 200 or 201, got {res.status_code}")
 ```
 
 ## Utvikling
