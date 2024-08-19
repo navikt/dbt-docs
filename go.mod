@@ -6,12 +6,12 @@ require (
 	cloud.google.com/go/bigquery v1.62.0
 	cloud.google.com/go/storage v1.43.0
 	github.com/labstack/echo/v4 v4.12.0
-	google.golang.org/api v0.191.0
+	google.golang.org/api v0.192.0
 )
 
 require (
 	cloud.google.com/go v0.115.0 // indirect
-	cloud.google.com/go/auth v0.7.3 // indirect
+	cloud.google.com/go/auth v0.8.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.3 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	cloud.google.com/go/iam v1.1.12 // indirect
