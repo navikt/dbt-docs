@@ -75,3 +75,4 @@ Kommandoen blir også kjørt automatisk ved bruk av `Air`.
 ### Kjøre lokalt med Air
 
     air
+ 
