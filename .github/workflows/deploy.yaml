@@ -10,7 +10,7 @@ env:
 jobs:
   build-and-push:
     name: Build and push
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
     outputs:
@@ -24,7 +24,7 @@ jobs:
 
   deploy:
     name: deploy
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [build-and-push]
     permissions:
       id-token: write
