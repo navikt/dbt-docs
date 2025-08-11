@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/bigquery v1.69.0
 	cloud.google.com/go/storage v1.56.0
 	github.com/labstack/echo/v4 v4.13.4
-	google.golang.org/api v0.244.0
+	google.golang.org/api v0.246.0
 )
 
 require (
