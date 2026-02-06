@@ -10,7 +10,7 @@ COPY pkg pkg
 
 RUN go build -o dbt-docs
 
-FROM alpine:3
+FROM alpine:3.23.3
 WORKDIR /app
 
 COPY --from=builder /src/dbt-docs /app/dbt-docs
