@@ -4,9 +4,9 @@ go 1.26.1
 
 require (
 	cloud.google.com/go/bigquery v1.76.0
-	cloud.google.com/go/storage v1.62.0
+	cloud.google.com/go/storage v1.62.1
 	github.com/labstack/echo/v4 v4.15.1
-	google.golang.org/api v0.275.0
+	google.golang.org/api v0.276.0
 )
 
 require (
