@@ -3,8 +3,7 @@ testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  args_bin = ["-bucket-name", "nada-dbt-docs-dev", "-no-metrics"]
-  bin = "./tmp/main"
+  entrypoint = ["./tmp/main", "-bucket-name", "nada-dbt-docs-dev", "-no-metrics"]
   cmd = "go build -o ./tmp/main ."
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "node_modules"]
@@ -14,7 +13,7 @@ tmp_dir = "tmp"
   follow_symlink = false
   full_bin = ""
   include_dir = []
-  include_ext = ["go", "tpl", "tmpl", "html"]
+  include_ext = ["go", "tpl", "tmpl", "html", "css", "js", "json"]
   include_file = []
   kill_delay = "0s"
   log = "build-errors.log"
