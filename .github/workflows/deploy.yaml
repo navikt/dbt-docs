@@ -6,6 +6,7 @@ on:
 
 env:
   IMAGE: dbt-docs
+  DBT_I_NAV_ZIP_URL: https://github.com/navikt/dbt-i-nav/releases/latest/download/dbt-i-nav-dist.zip
 
 jobs:
   build-and-push:
@@ -17,6 +18,13 @@ jobs:
       image: ${{ steps.docker-build-push.outputs.image }}
     steps:
     - uses: actions/checkout@v6
+    - name: Download dbt-i-nav frontend bundle
+      run: |
+        set -euo pipefail
+        rm -rf assets/dbt-i-nav
+        mkdir -p assets/dbt-i-nav
+        curl -fL "$DBT_I_NAV_ZIP_URL" -o /tmp/dbt-i-nav-dist.zip
+        unzip -oq /tmp/dbt-i-nav-dist.zip -d assets/dbt-i-nav
     - uses: nais/docker-build-push@v0
       id: docker-build-push
       with:
