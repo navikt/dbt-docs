@@ -40,12 +40,30 @@ func New(ctx context.Context, bucket string, bq *bigquery.BigQuery, logger *slog
 	}
 
 	server := echo.New()
-	server.Pre(middleware.RemoveTrailingSlash())
+	server.Pre(removeTrailingSlashExcept("/dbt-i-nav"))
 	server.Static("/assets", "assets")
+	server.GET("/dbt-i-nav", func(c echo.Context) error {
+		return c.Redirect(http.StatusTemporaryRedirect, "/dbt-i-nav/")
+	})
+	server.Static("/dbt-i-nav", "assets/dbt-i-nav")
 	parseTemplates(server)
 	setupRoutes(server, gcs, bq, logger)
 
 	return server, nil
+}
+
+func removeTrailingSlashExcept(prefix string) echo.MiddlewareFunc {
+	removeTrailingSlash := middleware.RemoveTrailingSlash()
+
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if strings.HasPrefix(c.Request().URL.Path, prefix) {
+				return next(c)
+			}
+
+			return removeTrailingSlash(next)(c)
+		}
+	}
 }
 
 func parseTemplates(server *echo.Echo) {
