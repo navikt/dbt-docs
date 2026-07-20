@@ -17,7 +17,7 @@ jobs:
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Download dbt-i-nav frontend bundle
       run: |
         set -euo pipefail
@@ -37,7 +37,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Deploy to dev
       uses: nais/deploy/actions/deploy@v2
       env:
