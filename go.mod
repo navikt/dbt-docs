@@ -3,8 +3,8 @@ module github.com/navikt/dbt-docs
 go 1.26.1
 
 require (
-	cloud.google.com/go/bigquery v1.80.0
-	cloud.google.com/go/storage v1.64.0
+	cloud.google.com/go/bigquery v1.81.0
+	cloud.google.com/go/storage v1.65.0
 	github.com/labstack/echo/v4 v4.15.4
 	google.golang.org/api v0.293.0
 )
