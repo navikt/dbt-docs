@@ -1,6 +1,6 @@
 module github.com/navikt/dbt-docs
 
-go 1.26.1
+go 1.26.7
 
 require (
 	cloud.google.com/go/bigquery v1.82.0
