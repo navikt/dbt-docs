@@ -67,10 +67,11 @@ if res.status_code not in ["200", "201"]:
 
 ### Generer CSS
 
+Installer avhengighetene lokalt med `pnpm install`.
 Du kan manuelt generere CSS med kommandoen nedenfor.
 Kommandoen blir også kjørt automatisk ved bruk av `Air`.
 
-    npx tailwindcss --postcss -i templates/input.css -o assets/css/main.css
+    pnpm exec tailwindcss -i templates/input.css -o assets/css/main.css
 
 ### Kjøre lokalt med Air
 

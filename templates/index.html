@@ -15,13 +15,13 @@
       />
     <link rel="stylesheet" href="/assets/css/main.css"/>
   </head>
-  <body class="w-full flex flex-col items-center min-h-screen bg-gradient-to-l from-orange-400 to-red-600">
+  <body class="w-full flex flex-col items-center min-h-screen bg-[linear-gradient(to_left,#ffaa33,#ad0000)]">
     <header class="w-full bg-[#00374F] flex justify-center">
       <div class="max-w-2xl grow flex justify-between py-2 text-white">
         <a href="/" class="flex gap-2 items-center">
           <img class="hover:animate-spin w-12 h-12" src="/assets/img/dbt.png"/>
           <h1 class="text-2xl font-bold">DBT docs</h1>
-          <span class="text-">by nada</span>
+          <span>by nada</span>
         </a>
       </div>
     </header>
@@ -33,11 +33,11 @@
         <article class="bg-white rounded-md p-4">
           <div class="flex flex-col gap-4">
             {{range $team, $docs := .dbtDocs}}
-            <h2 class="navds-heading navds-heading--medium">{{$team}}</h2>
+            <h2 class="aksel-heading aksel-heading--medium">{{$team}}</h2>
             <ul class="list-disc ml-4">
               {{range $doc := $docs}}
-              <li class="navds-list__item">
-                <a class="navds-link" href="/docs/{{$team}}/{{$doc}}">{{$doc}}</a>
+              <li>
+                <a class="aksel-link" href="/docs/{{$team}}/{{$doc}}">{{$doc}}</a>
               </li>
               {{end}}
             </ul>
@@ -48,7 +48,7 @@
         <article class="bg-white rounded-md p-4">
           <div class="flex flex-col gap-4">
             <p>
-              Ta en titt på <a class="navds-link" href="https://github.com/navikt/dbt-docs#publisering">navikt/dbt-docs</a> for publisering av dokumentasjon.
+              Ta en titt på <a class="aksel-link" href="https://github.com/navikt/dbt-docs#publisering">navikt/dbt-docs</a> for publisering av dokumentasjon.
             </p>
           </div>
         </article>
@@ -56,7 +56,7 @@
       </section>
     </div>
 
-    <footer class="mb-8 flex divide-x-2 divide-border-divider divide-solid">
+    <footer class="mb-8 flex divide-x-2 divide-ax-border-neutral-subtleA divide-solid">
       <p class="px-2">&copy; NADA. All documentation servered</p>
     </footer>
   </body>
