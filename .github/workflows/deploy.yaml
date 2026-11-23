@@ -24,7 +24,7 @@ jobs:
         mkdir -p assets/dbt-i-nav
         curl -fL "$DBT_I_NAV_ZIP_URL" -o /tmp/dbt-i-nav-dist.zip
         unzip -oq /tmp/dbt-i-nav-dist.zip -d assets/dbt-i-nav
-    - uses: nais/docker-build-push@v0
+    - uses: nais/docker-build-push@v1
       id: docker-build-push
       with:
         team: nada
